@@ -6,6 +6,14 @@ const cors = require("cors");
 
 const sequelize = require("./utils/database");
 const userRoute = require("./routes/userRoute");
+const homeRoute = require("./routes/homeRoute");
+const messageRoute = require("./routes/messageRoute");
+const groupRoute = require("./routes/groupRoute");
+
+const User = require("./models/userModel");
+const Message = require("./models/messageModel");
+const Group = require("./models/groupModel");
+const UserGroup = require("./models/userGroupModel");
 
 const app = express();
 app.use(express.static(path.join(__dirname, "..", "frontend")));
@@ -18,10 +26,22 @@ app.use(cors({
 }));
 
 app.use("/user", userRoute);
+app.use("/home", homeRoute);
+app.use("/message", messageRoute);
+app.use("/group", groupRoute);
 
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, "..", "frontend", "html", "login.html"));
 })
+
+User.belongsToMany(Group, { through: UserGroup });
+Group.belongsToMany(User, { through: UserGroup });
+
+User.hasMany(Message);
+Message.belongsTo(User);
+
+Group.hasMany(Message);
+Message.belongsTo(Group);
 
 sequelize
     //.sync({ force: true })
