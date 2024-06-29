@@ -22,8 +22,8 @@ const createGroup = async (req, res) => {
         });
         res.status(201).json({ message: "group created", group });
     } catch (error) {
-        console.error('error:', error);
-        res.status(500).json({ error: 'failed to create group' });
+        console.error("error:", error);
+        res.status(500).json({ error: "failed to create group" });
     }
 };
 
