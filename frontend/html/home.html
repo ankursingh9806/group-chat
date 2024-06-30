@@ -49,9 +49,14 @@
             <div class="group-option-container" style="display: none;">
                 <h1 id="group-name"></h1>
                 <div class="btn-container">
-                    <button class="btn btn-outline-secondary btn-sm" type="submit" id="delete-group-button">Delete group</button>
-                    <button class="btn btn-outline-secondary btn-sm" type="submit" id="add-to-group-button">Add people</button>
-                    <button class="btn btn-outline-secondary btn-sm" type="submit" id="remove-from-group-button">Remove people</button>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit" id="delete-group-button">Delete
+                        group</button>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit" id="add-to-group-button">Add
+                        people</button>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit" id="remove-from-group-button">Remove
+                        people</button>
+                    <button class="btn btn-outline-secondary btn-sm" type="submit" id="group-members-button">Group
+                        members</button>
                 </div>
             </div>
             <div id="message-container"></div>
@@ -73,6 +78,10 @@
 
     <!-- link to js file -->
     <script src="/js/home.js" defer></script>
+
+    <!-- jwt-decode -->
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+
 </body>
 
 </html>
