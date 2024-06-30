@@ -11,35 +11,64 @@ body {
     font-weight: bold;
 }
 
-/* container */
+/* main container */
 .main-container {
     display: flex;
     flex: 1;
 }
 
+/* first container */
 .first-container {
     flex: 1;
     padding: 20px;
+    max-width: 200px;
     background-color: #f0f0f0;
 }
 
+/* third container */
+.third-container {
+    flex: 1;
+    padding: 20px;
+    max-width: 250px;
+    background-color: #f0f0f0;
+}
+
+/* second container */
 .second-container {
-    flex: 5;
+    flex: 4;
     display: flex;
     flex-direction: column;
     padding: 20px;
 }
 
+/* message container */
 #message-container {
     flex: 1;
     overflow: auto;
-    max-height: 450px;
+    max-height: 400px;
     margin-bottom: 20px;
     padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
 }
 
+/* input container */
 .input-container {
     display: flex;
+}
+
+/* group option button container */
+.btn-container {
+    display: flex;
+    margin-right: 5px;
+}
+
+/* group option */
+.group-option-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 /* textarea */
@@ -53,20 +82,7 @@ textarea {
     padding: 6px;
 }
 
-/* logout button */
-#logout-button {
-    margin-left: 20px;
-}
-
 /* message */
-#message-container {
-    flex: 1;
-    overflow: auto;
-    max-height: 450px;
-    margin-bottom: 20px;
-    padding: 20px;
-}
-
 .message {
     padding: 10px;
 }
@@ -85,16 +101,11 @@ textarea {
     display: inline-block;
 }
 
-/* group button */
-#create-group {
-    width: 90%;
-    margin-bottom: 20px;
-}
-
-/* heading */
+/* headings */
 .join-heading {
     font-size: 14px;
     margin-left: 10px;
+    margin-top: 10px;
 }
 
 .welcome-heading {
@@ -106,8 +117,30 @@ textarea {
     text-align: center;
 }
 
+#group-name {
+    font-size: 24px;
+    color: #0d6efd;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-top: 10px;
+}
+
+/* buttons */
+#logout-button {
+    margin-left: 20px;
+}
+
 .btn-secondary {
     width: 90%;
     margin-bottom: 10px;
-    margin-left: 10px;
+    margin-left: 5px;
+}
+
+.btn-outline-secondary {
+    margin-left: 20px;
+}
+
+/* search */
+.search-form {
+    display: flex;
 }

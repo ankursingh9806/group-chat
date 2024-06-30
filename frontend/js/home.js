@@ -8,6 +8,8 @@ const heading = document.querySelector(".welcome-heading");
 const messageContainer = document.getElementById("message-container");
 const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
+const groupOption = document.querySelector(".group-option-container");
+const groupName = document.getElementById("group-name");
 
 logo.addEventListener("click", function () {
     window.location.href = "../html/home.html";
@@ -77,6 +79,8 @@ function showGroup(group) {
     newGroup.addEventListener("click", function () {
         inputContainer.style.display = "flex";
         heading.style.display = "none";
+        groupOption.style.display = "flex";
+        groupName.textContent = group.name;
         inputContainer.dataset.groupId = group.id;
         getMessage(group.id);
     });
