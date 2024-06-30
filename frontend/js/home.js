@@ -10,6 +10,7 @@ const messageInput = document.getElementById("message-input");
 const sendButton = document.getElementById("send-button");
 const groupOption = document.querySelector(".group-option-container");
 const groupName = document.getElementById("group-name");
+const deleteGroupButton = document.getElementById("delete-group-button");
 
 logo.addEventListener("click", function () {
     window.location.href = "../html/home.html";
@@ -21,6 +22,7 @@ logoutButton.addEventListener("click", logout);
 document.addEventListener("DOMContentLoaded", getGroups);
 createGroupButton.addEventListener("click", createGroup);
 sendButton.addEventListener("click", sendMessage);
+deleteGroupButton.addEventListener("click", deleteGroup);
 
 async function logout() {
     try {
@@ -76,6 +78,7 @@ function showGroup(group) {
     newGroup.className = "btn btn-secondary";
     newGroup.textContent = group.name;
     newGroup.dataset.groupId = group.id;
+    newGroup.id = `group-${group.id}`;
     newGroup.addEventListener("click", function () {
         inputContainer.style.display = "flex";
         heading.style.display = "none";
@@ -127,5 +130,51 @@ async function sendMessage() {
         getMessage(groupId);
     } catch (err) {
         console.error("message not sent:", err);
+    }
+}
+
+
+async function deleteGroup() {
+    try {
+        const groupId = inputContainer.dataset.groupId;
+        const token = localStorage.getItem("token");
+        const decodedToken = jwt_decode(token);
+        const userId = decodedToken.userId;
+        const groupRes = await axios.get(`http://localhost:3000/group/get-groups`, {
+            headers: {
+                Authorization: token
+            }
+        });
+        let group = null;
+        for (let i = 0; i < groupRes.data.groups.length; i++) {
+            if (groupRes.data.groups[i].id === parseInt(groupId)) {
+                group = groupRes.data.groups[i];
+                break;
+            }
+        }
+        if (group.admin !== parseInt(userId)) {
+            alert("Only admin can delete this group!");
+            return;
+        }
+        const confirmDelete = window.confirm("Are you sure you want to delete this group?");
+        if (confirmDelete) {
+            const deleteRes = await axios.delete(`http://localhost:3000/group/delete-group/${groupId}`, {
+                headers: {
+                    Authorization: token
+                }
+            });
+            if (deleteRes.status === 200) {
+                alert("Group deleted!");
+                const groupButton = document.getElementById(`group-${groupId}`);
+                if (groupButton) {
+                    groupButton.remove();
+                }
+                window.location.href = "../html/home.html";
+            } else {
+                alert("Group not deleted! Please try again.");
+            }
+        }
+    } catch (err) {
+        alert("An error occurred while deleting group!");
     }
 }
