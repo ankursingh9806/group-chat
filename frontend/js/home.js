@@ -2,8 +2,12 @@ const logoutButton = document.getElementById("logout-button");
 const logo = document.getElementById("logo");
 const home = document.getElementById("home");
 
-logo.addEventListener("click", () => window.location.href = "../html/home.html");
-home.addEventListener("click", () => window.location.href = "../html/home.html");
+logo.addEventListener("click", function () {
+    window.location.href = "../html/home.html";
+});
+home.addEventListener("click", function () {
+    window.location.href = "../html/home.html";
+});
 logoutButton.addEventListener("click", logout);
 
 async function logout() {
