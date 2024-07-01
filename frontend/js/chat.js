@@ -23,10 +23,12 @@ sendButton.addEventListener("click", sendMessage);
 async function getGroups() {
     try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:3000/group/get-groups", {
+        const res = await axios.get(`http://localhost:3000/group/get-groups`, {
             headers: { Authorization: token }
         });
-        res.data.groups.forEach(group => showGroup(group));
+        res.data.groups.forEach(group => {
+            showGroup(group);
+        });
     } catch (err) {
         console.error("failed to fetch groups:", err);
     }
@@ -34,10 +36,13 @@ async function getGroups() {
 
 async function createGroup() {
     try {
-        const groupName = window.prompt("Enter group name:");
-        if (!groupName) return;
+        const group = window.prompt("Enter group name:");
+        if (!group) return;
+        const groupData = {
+            groupName: group,
+        };
         const token = localStorage.getItem("token");
-        const res = await axios.post("http://localhost:3000/group/create-group", { groupName }, {
+        const res = await axios.post(`http://localhost:3000/group/create-group`, groupData, {
             headers: { Authorization: token }
         });
         if (res.status === 201) {
@@ -56,7 +61,7 @@ function showGroup(group) {
     newGroup.textContent = group.name;
     newGroup.dataset.groupId = group.id;
     newGroup.id = `group-${group.id}`;
-    newGroup.addEventListener("click", () => {
+    newGroup.addEventListener("click", function () {
         inputContainer.style.display = "flex";
         heading.style.display = "none";
         groupOption.style.display = "flex";
@@ -72,13 +77,15 @@ async function getMessage(groupId) {
     try {
         const token = localStorage.getItem("token");
         const res = await axios.get(`http://localhost:3000/message/get-message/${groupId}`, {
-            headers: { Authorization: token }
+            headers: { Authorization: token, },
         });
         messageContainer.innerHTML = "";
-        res.data.data.forEach(msg => {
+        res.data.data.forEach((msg) => {
             const messageElement = document.createElement("div");
             messageElement.className = "message";
-            messageElement.innerHTML = `<span class="message-name">${msg.name}</span><br><span class="message-text">${msg.message}</span>`;
+            messageElement.innerHTML = `
+                <span class="message-name">${msg.name}</span><br>
+                <span class="message-text">${msg.message}</span>`;
             messageContainer.appendChild(messageElement);
         });
     } catch (err) {
@@ -90,8 +97,12 @@ async function sendMessage() {
     try {
         const message = messageInput.value;
         const groupId = inputContainer.dataset.groupId;
+        const messageData = {
+            message: message,
+            groupId: groupId
+        };
         const token = localStorage.getItem("token");
-        await axios.post("http://localhost:3000/message/send-message", { message, groupId }, {
+        const res = await axios.post(`http://localhost:3000/message/send-message`, messageData, {
             headers: { Authorization: token }
         });
         messageInput.value = "";
@@ -105,26 +116,38 @@ async function isAdmin(groupId) {
     const token = localStorage.getItem("token");
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
-    const groupRes = await axios.get(`http://localhost:3000/group/get-groups`, {
+    const res = await axios.get(`http://localhost:3000/group/get-groups`, {
         headers: { Authorization: token }
     });
-    const group = groupRes.data.groups.find(group => group.id === parseInt(groupId));
-    return group && group.admin === parseInt(userId);
+    let group = null;
+    for (let i = 0; i < res.data.groups.length; i++) {
+        if (res.data.groups[i].id === parseInt(groupId)) {
+            group = res.data.groups[i];
+            break;
+        }
+    }
+    if (group && group.admin === parseInt(userId)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 async function deleteGroup() {
     try {
         const groupId = inputContainer.dataset.groupId;
-        const token = localStorage.getItem("token");
-        if (!(await isAdmin(groupId))) {
+        const isAdminUser = await isAdmin(groupId);
+        if (!isAdminUser) {
             alert("Only admin can delete this group!");
             return;
         }
-        if (window.confirm("Are you sure you want to delete this group?")) {
-            const deleteRes = await axios.delete(`http://localhost:3000/group/delete-group/${groupId}`, {
+        const confirm = window.confirm("Are you sure you want to delete this group?");
+        if (confirm) {
+            const token = localStorage.getItem("token");
+            const res = await axios.delete(`http://localhost:3000/group/delete-group/${groupId}`, {
                 headers: { Authorization: token }
             });
-            if (deleteRes.status === 200) {
+            if (res.status === 200) {
                 alert("Group deleted!");
                 document.getElementById(`group-${groupId}`).remove();
                 window.location.href = "../html/home.html";
@@ -147,7 +170,7 @@ async function addToGroup() {
         const email = window.prompt("Enter the email of the user to add:");
         if (!email) return;
         const token = localStorage.getItem("token");
-        const res = await axios.post("http://localhost:3000/group/add-to-group", { email, groupId }, {
+        const res = await axios.post(`http://localhost:3000/group/add-to-group`, { email, groupId }, {
             headers: { Authorization: token }
         });
         if (res.status === 200) {
@@ -176,7 +199,7 @@ async function removeFromGroup() {
         const email = window.prompt("Enter the email of the user to remove:");
         if (!email) return;
         const token = localStorage.getItem("token");
-        const res = await axios.post("http://localhost:3000/group/remove-from-group", { email, groupId }, {
+        const res = await axios.post(`http://localhost:3000/group/remove-from-group`, { email, groupId }, {
             headers: { Authorization: token }
         });
         if (res.status === 200) {
