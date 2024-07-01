@@ -49,7 +49,7 @@ const addToGroup = async (req, res) => {
     try {
         const { email, groupId } = req.body;
         const group = await Group.findByPk(groupId);
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ error: "user not found" });
         }
@@ -72,7 +72,7 @@ const removeFromGroup = async (req, res) => {
     try {
         const { email, groupId } = req.body;
         const group = await Group.findByPk(groupId);
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(404).json({ error: "user not found" });
         }
@@ -88,10 +88,38 @@ const removeFromGroup = async (req, res) => {
     }
 };
 
+const getGroupMembers = async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const group = await Group.findByPk(groupId);
+        const members = await UserGroup.findAll({
+            where: { groupId: groupId },
+            include: [{ model: User, attributes: ["id", "name", "email"] }]
+        });
+        if (!members.length) {
+            return res.status(404).json({ error: "no members found for this group" });
+        }
+        const users = members.map(member => {
+            const user = member.User;
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                isAdmin: user.id === group.admin
+            };
+        });
+        res.status(200).json({ users: users });
+    } catch (err) {
+        console.error("error:", err);
+        res.status(500).json({ error: "internal server error" });
+    }
+};
+
 module.exports = {
     getGroups,
     createGroup,
     deleteGroup,
     addToGroup,
     removeFromGroup,
+    getGroupMembers
 }
