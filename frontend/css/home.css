@@ -57,9 +57,8 @@ body {
 
 /* members container */
 .members-container {
-    padding: 20px;
-    max-width: 200px;
-    width: 50%;
+    max-width: 250px;
+    margin-right: 20px;
 }
 
 /* group option */
@@ -114,6 +113,11 @@ textarea {
     background-color: #f0f0f0;
     border-radius: 20px;
     text-align: center;
+}
+
+.members-heading {
+    font-weight: bold;
+    margin-top: 30px;
 }
 
 #group-name {
