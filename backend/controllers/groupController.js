@@ -45,8 +45,53 @@ const deleteGroup = async (req, res) => {
     }
 };
 
+const addToGroup = async (req, res) => {
+    try {
+        const { email, groupId } = req.body;
+        const group = await Group.findByPk(groupId);
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: "user not found" });
+        }
+        const userGroup = await UserGroup.findOne({ where: { UserId: user.id, groupId: groupId } });
+        if (userGroup) {
+            return res.status(400).json({ error: "user is already in the group" });
+        }
+        await UserGroup.create({
+            UserId: user.id,
+            groupId: groupId
+        });
+        res.status(200).json({ message: "user added to group" });
+    } catch (err) {
+        console.error("error:", err);
+        res.status(500).json({ error: "internal server error" });
+    }
+};
+
+const removeFromGroup = async (req, res) => {
+    try {
+        const { email, groupId } = req.body;
+        const group = await Group.findByPk(groupId);
+        const user = await User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: "user not found" });
+        }
+        const userGroup = await UserGroup.findOne({ where: { UserId: user.id, groupId: groupId } });
+        if (!userGroup) {
+            return res.status(400).json({ error: "user is not in the group" });
+        }
+        await userGroup.destroy();
+        res.status(200).json({ message: "user removed from group" });
+    } catch (err) {
+        console.error("error:", err);
+        res.status(500).json({ error: "internal server error" });
+    }
+};
+
 module.exports = {
     getGroups,
     createGroup,
     deleteGroup,
+    addToGroup,
+    removeFromGroup,
 }
