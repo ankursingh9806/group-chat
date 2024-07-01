@@ -25,14 +25,6 @@ body {
     background-color: #f0f0f0;
 }
 
-/* third container */
-.third-container {
-    flex: 1;
-    padding: 20px;
-    max-width: 250px;
-    background-color: #f0f0f0;
-}
-
 /* second container */
 .second-container {
     flex: 4;
@@ -61,6 +53,13 @@ body {
 .btn-container {
     display: flex;
     margin-right: 5px;
+}
+
+/* members container */
+.members-container {
+    padding: 20px;
+    max-width: 200px;
+    width: 50%;
 }
 
 /* group option */
