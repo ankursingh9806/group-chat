@@ -56,6 +56,7 @@ async function createGroup() {
     }
 }
 
+let messageInterval = null;
 function showGroup(group) {
     const newGroup = document.createElement("button");
     newGroup.className = "btn btn-secondary";
@@ -69,7 +70,13 @@ function showGroup(group) {
         membersContainer.style.display = "flex";
         groupName.textContent = group.name;
         inputContainer.dataset.groupId = group.id;
-        getMessage(group.id);
+        // getMessage(group.id);
+        if (messageInterval) {
+            clearInterval(messageInterval);
+        }
+        messageInterval = setInterval(() => {
+            getMessage(group.id);
+        }, 1000);
         showMembers(group.id);
     });
     firstContainer.appendChild(newGroup);
@@ -231,7 +238,7 @@ async function showMembers(groupId) {
         membersList.innerHTML = "";
         res.data.users.forEach(user => {
             const listItem = document.createElement("li");
-            listItem.textContent = `${user.name} (${user.email})${user.isAdmin ? " (Admin)" : ""}`;
+            listItem.textContent = `${user.name} (${user.email})${user.isAdmin ? " (dmin)" : ""}`;
             membersList.appendChild(listItem);
         });
         membersContainer.style.display = "block";
