@@ -43,6 +43,11 @@ Message.belongsTo(User);
 Group.hasMany(Message);
 Message.belongsTo(Group);
 
+UserGroup.belongsTo(User);
+UserGroup.belongsTo(Group);
+User.hasMany(UserGroup);
+Group.hasMany(UserGroup);
+
 sequelize
     //.sync({ force: true })
     .sync()
