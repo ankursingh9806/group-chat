@@ -8,6 +8,7 @@ const firstContainer = document.querySelector(".first-container");
 const inputContainer = document.querySelector(".input-container");
 const messageContainer = document.getElementById("message-container");
 const membersContainer = document.querySelector(".members-container");
+const membersList = document.getElementById("members-list");
 const messageInput = document.getElementById("message-input");
 const heading = document.querySelector(".welcome-heading");
 const groupOption = document.querySelector(".group-option-container");
@@ -69,6 +70,7 @@ function showGroup(group) {
         groupName.textContent = group.name;
         inputContainer.dataset.groupId = group.id;
         getMessage(group.id);
+        showMembers(group.id);
     });
     firstContainer.appendChild(newGroup);
 }
@@ -175,6 +177,7 @@ async function addToGroup() {
         });
         if (res.status === 200) {
             alert("User added to group!");
+            showMembers(groupId);
         } else {
             alert("Failed to add user to group!");
         }
@@ -204,6 +207,7 @@ async function removeFromGroup() {
         });
         if (res.status === 200) {
             alert("User removed from group!");
+            showMembers(groupId);
         } else {
             alert("Failed to remove user from group!");
         }
@@ -215,5 +219,23 @@ async function removeFromGroup() {
         } else {
             alert("An error occurred in removing user. Please try again later.");
         }
+    }
+}
+
+async function showMembers(groupId) {
+    try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`http://localhost:3000/group/get-group-members/${groupId}`, {
+            headers: { Authorization: token }
+        });
+        membersList.innerHTML = "";
+        res.data.users.forEach(user => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `${user.name} (${user.email})${user.isAdmin ? " (Admin)" : ""}`;
+            membersList.appendChild(listItem);
+        });
+        membersContainer.style.display = "block";
+    } catch (err) {
+        alert("failed to fetch group members. Please try again later.");
     }
 }
