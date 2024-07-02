@@ -56,5 +56,5 @@ sequelize
         console.log("server is synced with database");
     })
     .catch((err) => {
-        console.error("server is unable to unable to sync with database:", err);
+        console.error("server is unable to sync with database:", err);
     });

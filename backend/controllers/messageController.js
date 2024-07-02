@@ -6,9 +6,9 @@ const sendMessage = async (req, res) => {
         const { message, groupId } = req.body;
         const newMessage = await Message.create({
             name: req.user.name,
-            message,
+            message: message,
             UserId: req.user.id,
-            groupId
+            groupId: groupId
         });
         res.status(201).json({ message: "message sent", data: newMessage });
     } catch (err) {
