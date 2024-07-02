@@ -56,6 +56,7 @@ async function createGroup() {
     }
 }
 
+let messageInterval = null;
 function showGroup(group) {
     const newGroup = document.createElement("button");
     newGroup.className = "btn btn-secondary";
@@ -71,7 +72,13 @@ function showGroup(group) {
             membersContainer.style.display = "flex";
             groupName.textContent = group.name;
             inputContainer.dataset.groupId = group.id;
-            getMessage(group.id);
+            // getMessage(group.id);
+            if (messageInterval) {
+                clearInterval(messageInterval);
+            }
+            messageInterval = setInterval(() => {
+                getMessage(group.id);
+            }, 1000);
             showMembers(group.id);
         } else {
             alert("You are not a member of this group! You can join this group when Admin adds you.");
