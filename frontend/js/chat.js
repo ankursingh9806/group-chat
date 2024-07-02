@@ -56,44 +56,61 @@ async function createGroup() {
     }
 }
 
-let messageInterval = null;
 function showGroup(group) {
     const newGroup = document.createElement("button");
     newGroup.className = "btn btn-secondary";
     newGroup.textContent = group.name;
     newGroup.dataset.groupId = group.id;
     newGroup.id = `group-${group.id}`;
-    newGroup.addEventListener("click", function () {
-        inputContainer.style.display = "flex";
-        heading.style.display = "none";
-        groupOption.style.display = "flex";
-        membersContainer.style.display = "flex";
-        groupName.textContent = group.name;
-        inputContainer.dataset.groupId = group.id;
-        // getMessage(group.id);
-        if (messageInterval) {
-            clearInterval(messageInterval);
-        }
-        messageInterval = setInterval(() => {
+    newGroup.addEventListener("click", async function () {
+        const isMember = await checkMembership(group.id);
+        if (isMember) {
+            inputContainer.style.display = "flex";
+            heading.style.display = "none";
+            groupOption.style.display = "flex";
+            membersContainer.style.display = "flex";
+            groupName.textContent = group.name;
+            inputContainer.dataset.groupId = group.id;
             getMessage(group.id);
-        }, 1000);
-        showMembers(group.id);
+            showMembers(group.id);
+        } else {
+            alert("You are not a member of this group! You can join this group when Admin adds you.");
+        }
     });
     firstContainer.appendChild(newGroup);
+}
+
+async function checkMembership(groupId) {
+    const token = localStorage.getItem("token");
+    const decodedToken = jwt_decode(token);
+    const userId = decodedToken.userId;
+    try {
+        const res = await axios.get(`http://localhost:3000/group/get-group-members/${groupId}`, {
+            headers: { Authorization: token }
+        });
+        const members = res.data.users;
+        for (let i = 0; i < members.length; i++) {
+            if (members[i].id === userId) {
+                return true;
+            }
+        }
+    } catch (err) {
+        console.error("error:", err);
+    }
 }
 
 async function getMessage(groupId) {
     try {
         const token = localStorage.getItem("token");
         const res = await axios.get(`http://localhost:3000/message/get-message/${groupId}`, {
-            headers: { Authorization: token, },
+            headers: { Authorization: token }
         });
         messageContainer.innerHTML = "";
         res.data.data.forEach((msg) => {
             const messageElement = document.createElement("div");
             messageElement.className = "message";
-            messageElement.innerHTML = `
-                <span class="message-name">${msg.name}</span><br>
+            messageElement.innerHTML =
+                `<span class="message-name">${msg.name}</span><br>
                 <span class="message-text">${msg.message}</span>`;
             messageContainer.appendChild(messageElement);
         });
@@ -238,7 +255,7 @@ async function showMembers(groupId) {
         membersList.innerHTML = "";
         res.data.users.forEach(user => {
             const listItem = document.createElement("li");
-            listItem.textContent = `${user.name} (${user.email})${user.isAdmin ? " (dmin)" : ""}`;
+            listItem.textContent = `${user.name} (${user.email})${user.isAdmin ? " (Admin)" : ""}`;
             membersList.appendChild(listItem);
         });
         membersContainer.style.display = "block";
