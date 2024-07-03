@@ -28,7 +28,7 @@ async function getGroups() {
             headers: { Authorization: token }
         });
         res.data.groups.forEach(group => {
-            showGroup(group);
+            clickOnGroup(group);
         });
     } catch (err) {
         console.error("failed to fetch groups:", err);
@@ -47,7 +47,7 @@ async function createGroup() {
             headers: { Authorization: token }
         });
         if (res.status === 201) {
-            showGroup(res.data.group);
+            clickOnGroup(res.data.group);
         } else {
             alert("Group not created. Please try again");
         }
@@ -57,7 +57,7 @@ async function createGroup() {
 }
 
 let messageInterval = null;
-function showGroup(group) {
+function clickOnGroup(group) {
     const newGroup = document.createElement("button");
     newGroup.className = "btn btn-secondary";
     newGroup.textContent = group.name;
@@ -114,16 +114,20 @@ async function getMessage(groupId) {
         });
         messageContainer.innerHTML = "";
         res.data.data.forEach((msg) => {
-            const messageElement = document.createElement("div");
-            messageElement.className = "message";
-            messageElement.innerHTML =
-                `<span class="message-name">${msg.name}</span><br>
-                <span class="message-text">${msg.message}</span>`;
-            messageContainer.appendChild(messageElement);
+            showMessage(msg);
         });
     } catch (err) {
         console.error("failed to fetch messages:", err);
     }
+}
+
+function showMessage(msg) {
+    const messageElement = document.createElement("div");
+    messageElement.className = "message";
+    messageElement.innerHTML = `
+        <span class="message-name">${msg.name}</span><br>
+    <span class="message-text">${msg.message}</span>`;
+    messageContainer.appendChild(messageElement);
 }
 
 async function sendMessage() {
