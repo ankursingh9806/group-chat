@@ -137,6 +137,11 @@ textarea {
     margin-left: 20px;
 }
 
+#media-send-button {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
 .btn-secondary {
     width: 90%;
     margin-bottom: 10px;
