@@ -78,11 +78,26 @@ const logout = async (req, res, next) => {
     }
 }
 
+const getUserName = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ error: "user not found" });
+        }
+        res.status(200).json({ name: user.name });
+    } catch (err) {
+        console.error("error:", err);
+        res.status(500).json({ error: "internal server error" });
+    }
+};
+
 module.exports = {
     signupPage,
     loginPage,
     signup,
     login,
     generateAccessToken,
-    logout
+    logout,
+    getUserName
 }
