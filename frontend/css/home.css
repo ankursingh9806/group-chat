@@ -20,8 +20,10 @@ body {
 /* first container */
 .first-container {
     flex: 1;
+    overflow: auto;
+    max-height: 550px;
     padding: 20px;
-    max-width: 200px;
+    max-width: 220px;
     background-color: #f0f0f0;
 }
 
@@ -57,6 +59,8 @@ body {
 
 /* members container */
 .members-container {
+    overflow: auto;
+    max-height: 550px;
     max-width: 250px;
     margin-right: 20px;
 }
