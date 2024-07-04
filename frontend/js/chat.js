@@ -14,6 +14,13 @@ const heading = document.querySelector(".welcome-heading");
 const groupOption = document.querySelector(".group-option-container");
 const groupName = document.getElementById("group-name");
 
+const socket = io("http://localhost:3000");
+
+socket.on("sendMessage", (data) => {
+    // console.log("message received:", data);
+    showMessage(data);
+});
+
 document.addEventListener("DOMContentLoaded", getGroups);
 createGroupButton.addEventListener("click", createGroup);
 deleteGroupButton.addEventListener("click", deleteGroup);
@@ -56,7 +63,7 @@ async function createGroup() {
     }
 }
 
-let messageInterval = null;
+// let messageInterval = null;
 function clickOnGroup(group) {
     const newGroup = document.createElement("button");
     newGroup.className = "btn btn-secondary";
@@ -72,13 +79,13 @@ function clickOnGroup(group) {
             membersContainer.style.display = "flex";
             groupName.textContent = group.name;
             inputContainer.dataset.groupId = group.id;
-            // getMessage(group.id);
-            if (messageInterval) {
-                clearInterval(messageInterval);
-            }
-            messageInterval = setInterval(() => {
-                getMessage(group.id);
-            }, 1000);
+            getMessage(group.id);
+            // if (messageInterval) {
+            //     clearInterval(messageInterval);
+            // }
+            // messageInterval = setInterval(() => {
+            //     getMessage(group.id);
+            // }, 1000);
             showMembers(group.id);
         } else {
             alert("You are not a member of this group! You can join this group when Admin adds you.");
@@ -126,24 +133,38 @@ function showMessage(msg) {
     messageElement.className = "message";
     messageElement.innerHTML = `
         <span class="message-name">${msg.name}</span><br>
-    <span class="message-text">${msg.message}</span>`;
+        <span class="message-text">${msg.message}</span>`;
     messageContainer.appendChild(messageElement);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    messageContainer.scrollTop = messageContainer.scrollHeight;
 }
 
 async function sendMessage() {
     try {
         const message = messageInput.value;
         const groupId = inputContainer.dataset.groupId;
-        const messageData = {
-            message: message,
-            groupId: groupId
-        };
         const token = localStorage.getItem("token");
-        const res = await axios.post(`http://localhost:3000/message/send-message`, messageData, {
+        const decodedToken = jwt_decode(token);
+        const userId = decodedToken.userId;
+        const res = await axios.get(`http://localhost:3000/user/user-name/${userId}`, {
             headers: { Authorization: token }
         });
+        const userName = res.data.name;
+        const messageData = {
+            message: message,
+            groupId: groupId,
+            name: userName
+        };
+        await axios.post(`http://localhost:3000/message/send-message`, messageData, {
+            headers: { Authorization: token }
+        });
+        socket.emit("receiveMessage", messageData);
+        // console.log("message sent:", messageData);
         messageInput.value = "";
-        getMessage(groupId);
+        // getMessage(groupId);
     } catch (err) {
         console.error("message not sent:", err);
     }
