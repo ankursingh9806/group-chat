@@ -3,6 +3,8 @@ const deleteGroupButton = document.getElementById("delete-group-button");
 const addToGroupButton = document.getElementById("add-to-group-button");
 const removeFromGroupButton = document.getElementById("remove-from-group-button");
 const sendButton = document.getElementById("send-button");
+const attachFileButton = document.getElementById("attach-file-button");
+const fileInput = document.getElementById("file-input");
 
 const firstContainer = document.querySelector(".first-container");
 const inputContainer = document.querySelector(".input-container");
@@ -27,6 +29,10 @@ deleteGroupButton.addEventListener("click", deleteGroup);
 addToGroupButton.addEventListener("click", addToGroup);
 removeFromGroupButton.addEventListener("click", removeFromGroup);
 sendButton.addEventListener("click", sendMessage);
+attachFileButton.addEventListener("click", () => {
+    fileInput.click();
+});
+fileInput.addEventListener("change", uploadFile);
 
 async function getGroups() {
     try {
@@ -94,6 +100,128 @@ function clickOnGroup(group) {
     firstContainer.appendChild(newGroup);
 }
 
+async function getMessage(groupId) {
+    try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`http://localhost:3000/message/get-message/${groupId}`, {
+            headers: { Authorization: token }
+        });
+        messageContainer.innerHTML = "";
+        res.data.data.forEach((msg) => {
+            showMessage(msg);
+        });
+    } catch (err) {
+        console.error("failed to fetch messages:", err);
+    }
+}
+
+// function showMessage(msg) {
+//     const messageElement = document.createElement("div");
+//     messageElement.className = "message";
+//     messageElement.innerHTML = `
+//         <span class="message-name">${msg.name}</span><br>
+//         <span class="message-text">${msg.message}</span>`;
+//     messageContainer.appendChild(messageElement);
+//     scrollToBottom();
+// }
+function showMessage(msg) {
+    const messageElement = document.createElement("div");
+    messageElement.className = "message";
+    let messageHTML = `
+        <span class="message-name">${msg.name}</span><br>
+        <span class="message-text">${msg.message || ""}</span>`;
+    if (msg.fileUrl) {
+        messageHTML += `
+        <br>
+        <a href="${msg.fileUrl}" target="_blank">View File</a>`;
+    }
+    messageElement.innerHTML = messageHTML;
+    messageContainer.appendChild(messageElement);
+    scrollToBottom();
+}
+
+// async function sendMessage() {
+//     try {
+//         const message = messageInput.value;
+//         const groupId = inputContainer.dataset.groupId;
+//         const token = localStorage.getItem("token");
+//         const decodedToken = jwt_decode(token);
+//         const userId = decodedToken.userId;
+//         const res = await axios.get(`http://localhost:3000/user/user-name/${userId}`, {
+//             headers: { Authorization: token }
+//         });
+//         const userName = res.data.name;
+//         const messageData = {
+//             message: message,
+//             groupId: groupId,
+//             name: userName
+//         };
+//         await axios.post(`http://localhost:3000/message/send-message`, messageData, {
+//             headers: { Authorization: token }
+//         });
+//         socket.emit("receiveMessage", messageData);
+//         // console.log("message sent:", messageData);
+//         messageInput.value = "";
+//         // getMessage(groupId);
+//     } catch (err) {
+//         console.error("message not sent:", err);
+//     }
+// }
+async function sendMessage() {
+    try {
+        const message = messageInput.value;
+        const groupId = inputContainer.dataset.groupId;
+        const token = localStorage.getItem("token");
+        const decodedToken = jwt_decode(token);
+        const userId = decodedToken.userId;
+        const res = await axios.get(`http://localhost:3000/user/user-name/${userId}`, {
+            headers: { Authorization: token }
+        });
+        const userName = res.data.name;
+        if (fileInput.files.length > 0) {
+            uploadFile({ target: { files: [fileInput.files[0]] } });
+        } else {
+            const messageData = {
+                message: message,
+                groupId: groupId,
+                name: userName
+            };
+            await axios.post(`http://localhost:3000/message/send-message`, messageData, {
+                headers: { Authorization: token }
+            });
+            socket.emit("receiveMessage", messageData);
+        }
+        messageInput.value = "";
+    } catch (err) {
+        console.error("message not sent:", err);
+    }
+}
+
+async function uploadFile(e) {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+        const groupId = inputContainer.dataset.groupId;
+        const token = localStorage.getItem("token");
+        const res = await axios.post(`http://localhost:3000/message/upload-file/${groupId}`, formData, {
+            headers: {
+                Authorization: token,
+                "Content-Type": "multipart/form-data"
+            }
+        });
+        const newMessage = res.data.data;
+        socket.emit("receiveMessage", newMessage);
+        messageInput.value = "";
+    } catch (err) {
+        console.error("file not uploaded:", err);
+    }
+}
+
+function scrollToBottom() {
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+}
+
 async function checkMembership(groupId) {
     const token = localStorage.getItem("token");
     const decodedToken = jwt_decode(token);
@@ -110,63 +238,6 @@ async function checkMembership(groupId) {
         }
     } catch (err) {
         console.error("error:", err);
-    }
-}
-
-async function getMessage(groupId) {
-    try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:3000/message/get-message/${groupId}`, {
-            headers: { Authorization: token }
-        });
-        messageContainer.innerHTML = "";
-        res.data.data.forEach((msg) => {
-            showMessage(msg);
-        });
-    } catch (err) {
-        console.error("failed to fetch messages:", err);
-    }
-}
-
-function showMessage(msg) {
-    const messageElement = document.createElement("div");
-    messageElement.className = "message";
-    messageElement.innerHTML = `
-        <span class="message-name">${msg.name}</span><br>
-        <span class="message-text">${msg.message}</span>`;
-    messageContainer.appendChild(messageElement);
-    scrollToBottom();
-}
-
-function scrollToBottom() {
-    messageContainer.scrollTop = messageContainer.scrollHeight;
-}
-
-async function sendMessage() {
-    try {
-        const message = messageInput.value;
-        const groupId = inputContainer.dataset.groupId;
-        const token = localStorage.getItem("token");
-        const decodedToken = jwt_decode(token);
-        const userId = decodedToken.userId;
-        const res = await axios.get(`http://localhost:3000/user/user-name/${userId}`, {
-            headers: { Authorization: token }
-        });
-        const userName = res.data.name;
-        const messageData = {
-            message: message,
-            groupId: groupId,
-            name: userName
-        };
-        await axios.post(`http://localhost:3000/message/send-message`, messageData, {
-            headers: { Authorization: token }
-        });
-        socket.emit("receiveMessage", messageData);
-        // console.log("message sent:", messageData);
-        messageInput.value = "";
-        // getMessage(groupId);
-    } catch (err) {
-        console.error("message not sent:", err);
     }
 }
 
