@@ -16,6 +16,7 @@ const User = require("./models/userModel");
 const Message = require("./models/messageModel");
 const Group = require("./models/groupModel");
 const UserGroup = require("./models/userGroupModel");
+const ArchiveChat = require("./models/archiveChatModel");
 
 const app = express();
 const server = createServer(app);
@@ -83,3 +84,5 @@ sequelize
     .catch((err) => {
         console.error("server is unable to sync with database:", err);
     });
+
+require("./utils/cron");
