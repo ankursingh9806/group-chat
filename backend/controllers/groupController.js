@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Group = require("../models/groupModel");
 const UserGroup = require("../models/userGroupModel");
+const sequelize = require("../utils/database");
 
 const getGroups = async (req, res) => {
     try {
