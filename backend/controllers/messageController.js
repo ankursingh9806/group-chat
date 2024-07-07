@@ -3,6 +3,7 @@ const Group = require("../models/groupModel");
 const uploadToS3 = require("../services/s3Services");
 
 const sendMessage = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const { message, groupId } = req.body;
         const newMessage = await Message.create({
@@ -10,9 +11,11 @@ const sendMessage = async (req, res) => {
             message: message,
             UserId: req.user.id,
             groupId: groupId
-        });
+        }, { transaction: t });
+        await t.commit();
         res.status(201).json({ message: "message sent", data: newMessage });
     } catch (err) {
+        await t.rollback();
         console.error("error:", err);
         res.status(500).json({ error: "internal server error" });
     }
@@ -24,7 +27,7 @@ const getMessage = async (req, res) => {
         const messages = await Message.findAll({
             where: { groupId: groupId },
         });
-        res.status(200).json({ message: "message received", data: messages });
+        res.status(200).json({ message: "messages received", data: messages });
     } catch (err) {
         console.error("error:", err);
         res.status(500).json({ error: "internal server error" });
@@ -32,6 +35,7 @@ const getMessage = async (req, res) => {
 };
 
 const uploadFile = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const fileName = req.file.originalname;
         const fileBuffer = req.file.buffer;
@@ -41,9 +45,11 @@ const uploadFile = async (req, res) => {
             fileUrl: fileUrl,
             UserId: req.user.id,
             groupId: req.params.groupId
-        });
+        }, { transaction: t });
+        await t.commit();
         res.status(201).json({ message: "file sent", data: newMessage });
     } catch (err) {
+        await t.rollback();
         console.error("error:", err);
         res.status(500).json({ error: "internal server error" });
     }

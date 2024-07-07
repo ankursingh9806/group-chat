@@ -13,76 +13,92 @@ const getGroups = async (req, res) => {
 };
 
 const createGroup = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const { groupName } = req.body;
         const group = await Group.create({
             name: groupName,
             admin: req.user.id,
-        });
+        }, { transaction: t });
         await UserGroup.create({
             UserId: req.user.id,
             groupId: group.id,
-        });
+        }, { transaction: t });
+        await t.commit();
         res.status(201).json({ message: "group created", group: group });
     } catch (error) {
+        await t.rollback();
         console.error("error:", error);
         res.status(500).json({ error: "failed to create group" });
     }
 };
 
 const deleteGroup = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const { groupId } = req.params;
-        const group = await Group.findByPk(groupId);
+        const group = await Group.findByPk(groupId, { transaction: t });
         if (group.admin !== req.user.id) {
+            await t.rollback();
             return res.status(403).json({ error: "only admin can delete this group" });
         }
-        await group.destroy();
+        await group.destroy({ transaction: t });
+        await t.commit();
         res.status(200).json({ message: "group deleted" });
     } catch (err) {
+        await t.rollback();
         console.error("error:", err);
         res.status(500).json({ error: "internal server error" });
     }
 };
 
 const addToGroup = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const { email, groupId } = req.body;
-        const group = await Group.findByPk(groupId);
-        const user = await User.findOne({ where: { email: email } });
+        const group = await Group.findByPk(groupId, { transaction: t });
+        const user = await User.findOne({ where: { email: email }, transaction: t });
         if (!user) {
+            await t.rollback();
             return res.status(404).json({ error: "user not found" });
         }
-        const userGroup = await UserGroup.findOne({ where: { UserId: user.id, groupId: groupId } });
+        const userGroup = await UserGroup.findOne({ where: { UserId: user.id, groupId: groupId }, transaction: t });
         if (userGroup) {
+            await t.rollback();
             return res.status(400).json({ error: "user is already in the group" });
         }
         await UserGroup.create({
             UserId: user.id,
             groupId: groupId
-        });
+        }, { transaction: t });
+        await t.commit();
         res.status(200).json({ message: "user added to group" });
     } catch (err) {
+        await t.rollback();
         console.error("error:", err);
         res.status(500).json({ error: "internal server error" });
     }
 };
 
 const removeFromGroup = async (req, res) => {
+    const t = await sequelize.transaction();
     try {
         const { email, groupId } = req.body;
-        const group = await Group.findByPk(groupId);
-        const user = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: email }, transaction: t });
         if (!user) {
+            await t.rollback();
             return res.status(404).json({ error: "user not found" });
         }
-        const userGroup = await UserGroup.findOne({ where: { UserId: user.id, groupId: groupId } });
+        const userGroup = await UserGroup.findOne({ where: { UserId: user.id, groupId: groupId }, transaction: t });
         if (!userGroup) {
+            await t.rollback();
             return res.status(400).json({ error: "user is not in the group" });
         }
-        await userGroup.destroy();
+        await userGroup.destroy({ transaction: t });
+        await t.commit();
         res.status(200).json({ message: "user removed from group" });
     } catch (err) {
+        await t.rollback();
         console.error("error:", err);
         res.status(500).json({ error: "internal server error" });
     }
@@ -122,4 +138,4 @@ module.exports = {
     addToGroup,
     removeFromGroup,
     getGroupMembers
-}
+};
