@@ -1,6 +1,7 @@
 const Message = require("../models/messageModel");
 const Group = require("../models/groupModel");
 const uploadToS3 = require("../services/s3Services");
+const sequelize = require("../utils/database");
 
 const sendMessage = async (req, res) => {
     const t = await sequelize.transaction();
