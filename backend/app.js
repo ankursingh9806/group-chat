@@ -11,12 +11,14 @@ const userRoute = require("./routes/userRoute");
 const homeRoute = require("./routes/homeRoute");
 const messageRoute = require("./routes/messageRoute");
 const groupRoute = require("./routes/groupRoute");
+const resetPasswordRoute = require("./routes/resetPasswordRoute");
 
 const User = require("./models/userModel");
 const Message = require("./models/messageModel");
 const Group = require("./models/groupModel");
 const UserGroup = require("./models/userGroupModel");
 const ArchiveChat = require("./models/archiveChatModel");
+const ResetPassword = require("./models/resetPasswordModel");
 
 const app = express();
 const server = createServer(app);
@@ -42,6 +44,7 @@ app.use("/user", userRoute);
 app.use("/home", homeRoute);
 app.use("/message", messageRoute);
 app.use("/group", groupRoute);
+app.use("/password", resetPasswordRoute);
 
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, "..", "frontend", "html", "login.html"));
@@ -72,6 +75,9 @@ UserGroup.belongsTo(User);
 UserGroup.belongsTo(Group);
 User.hasMany(UserGroup);
 Group.hasMany(UserGroup);
+
+User.hasMany(ResetPassword);
+ResetPassword.belongsTo(User);
 
 sequelize
     //.sync({ force: true })
