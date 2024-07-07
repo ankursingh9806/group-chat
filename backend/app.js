@@ -2,9 +2,12 @@ require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const cors = require("cors");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
+const helmet = require("helmet");
+const morgan = require("morgan");
 
 const sequelize = require("./utils/database");
 const userRoute = require("./routes/userRoute");
@@ -21,6 +24,20 @@ const ArchiveChat = require("./models/archiveChatModel");
 const ResetPassword = require("./models/resetPasswordModel");
 
 const app = express();
+
+const accessLogStream = fs.createWriteStream(path.join(__dirname, "access.log"), { file: "a" })
+app.use(morgan("combined", { stream: accessLogStream }));
+
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://cdn.socket.io"],
+            styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+        }
+    }
+}));
+
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
