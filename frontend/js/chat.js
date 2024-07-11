@@ -16,7 +16,7 @@ const heading = document.querySelector(".welcome-heading");
 const groupOption = document.querySelector(".group-option-container");
 const groupName = document.getElementById("group-name");
 
-const socket = io("http://localhost:3000");
+const socket = io("http://3.104.119.209:3000");
 
 socket.on("sendMessage", (data) => {
     // console.log("message received:", data);
@@ -37,7 +37,7 @@ fileInput.addEventListener("change", uploadFile);
 async function getGroups() {
     try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:3000/group/get-groups`, {
+        const res = await axios.get(`http://3.104.119.209:3000/group/get-groups`, {
             headers: { Authorization: token }
         });
         res.data.groups.forEach(group => {
@@ -56,7 +56,7 @@ async function createGroup() {
             groupName: group,
         };
         const token = localStorage.getItem("token");
-        const res = await axios.post(`http://localhost:3000/group/create-group`, groupData, {
+        const res = await axios.post(`http://3.104.119.209:3000/group/create-group`, groupData, {
             headers: { Authorization: token }
         });
         if (res.status === 201) {
@@ -103,7 +103,7 @@ function clickOnGroup(group) {
 async function getMessage(groupId) {
     try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:3000/message/get-message/${groupId}`, {
+        const res = await axios.get(`http://3.104.119.209:3000/message/get-message/${groupId}`, {
             headers: { Authorization: token }
         });
         messageContainer.innerHTML = "";
@@ -147,7 +147,7 @@ function showMessage(msg) {
 //         const token = localStorage.getItem("token");
 //         const decodedToken = jwt_decode(token);
 //         const userId = decodedToken.userId;
-//         const res = await axios.get(`http://localhost:3000/user/user-name/${userId}`, {
+//         const res = await axios.get(`http://3.104.119.209:3000/user/user-name/${userId}`, {
 //             headers: { Authorization: token }
 //         });
 //         const userName = res.data.name;
@@ -156,7 +156,7 @@ function showMessage(msg) {
 //             groupId: groupId,
 //             name: userName
 //         };
-//         await axios.post(`http://localhost:3000/message/send-message`, messageData, {
+//         await axios.post(`http://3.104.119.209:3000/message/send-message`, messageData, {
 //             headers: { Authorization: token }
 //         });
 //         socket.emit("receiveMessage", messageData);
@@ -174,7 +174,7 @@ async function sendMessage() {
         const token = localStorage.getItem("token");
         const decodedToken = jwt_decode(token);
         const userId = decodedToken.userId;
-        const res = await axios.get(`http://localhost:3000/user/user-name/${userId}`, {
+        const res = await axios.get(`http://3.104.119.209:3000/user/user-name/${userId}`, {
             headers: { Authorization: token }
         });
         const userName = res.data.name;
@@ -186,7 +186,7 @@ async function sendMessage() {
                 groupId: groupId,
                 name: userName
             };
-            await axios.post(`http://localhost:3000/message/send-message`, messageData, {
+            await axios.post(`http://3.104.119.209:3000/message/send-message`, messageData, {
                 headers: { Authorization: token }
             });
             socket.emit("receiveMessage", messageData);
@@ -204,7 +204,7 @@ async function uploadFile(e) {
     try {
         const groupId = inputContainer.dataset.groupId;
         const token = localStorage.getItem("token");
-        const res = await axios.post(`http://localhost:3000/message/upload-file/${groupId}`, formData, {
+        const res = await axios.post(`http://3.104.119.209:3000/message/upload-file/${groupId}`, formData, {
             headers: {
                 Authorization: token,
                 "Content-Type": "multipart/form-data"
@@ -227,7 +227,7 @@ async function checkMembership(groupId) {
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
     try {
-        const res = await axios.get(`http://localhost:3000/group/get-group-members/${groupId}`, {
+        const res = await axios.get(`http://3.104.119.209:3000/group/get-group-members/${groupId}`, {
             headers: { Authorization: token }
         });
         const members = res.data.users;
@@ -245,7 +245,7 @@ async function isAdmin(groupId) {
     const token = localStorage.getItem("token");
     const decodedToken = jwt_decode(token);
     const userId = decodedToken.userId;
-    const res = await axios.get(`http://localhost:3000/group/get-groups`, {
+    const res = await axios.get(`http://3.104.119.209:3000/group/get-groups`, {
         headers: { Authorization: token }
     });
     let group = null;
@@ -273,7 +273,7 @@ async function deleteGroup() {
         const confirm = window.confirm("Are you sure you want to delete this group?");
         if (confirm) {
             const token = localStorage.getItem("token");
-            const res = await axios.delete(`http://localhost:3000/group/delete-group/${groupId}`, {
+            const res = await axios.delete(`http://3.104.119.209:3000/group/delete-group/${groupId}`, {
                 headers: { Authorization: token }
             });
             if (res.status === 200) {
@@ -299,7 +299,7 @@ async function addToGroup() {
         const email = window.prompt("Enter the email of the user to add:");
         if (!email) return;
         const token = localStorage.getItem("token");
-        const res = await axios.post(`http://localhost:3000/group/add-to-group`, { email, groupId }, {
+        const res = await axios.post(`http://3.104.119.209:3000/group/add-to-group`, { email, groupId }, {
             headers: { Authorization: token }
         });
         if (res.status === 200) {
@@ -329,7 +329,7 @@ async function removeFromGroup() {
         const email = window.prompt("Enter the email of the user to remove:");
         if (!email) return;
         const token = localStorage.getItem("token");
-        const res = await axios.post(`http://localhost:3000/group/remove-from-group`, { email, groupId }, {
+        const res = await axios.post(`http://3.104.119.209:3000/group/remove-from-group`, { email, groupId }, {
             headers: { Authorization: token }
         });
         if (res.status === 200) {
@@ -352,7 +352,7 @@ async function removeFromGroup() {
 async function showMembers(groupId) {
     try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:3000/group/get-group-members/${groupId}`, {
+        const res = await axios.get(`http://3.104.119.209:3000/group/get-group-members/${groupId}`, {
             headers: { Authorization: token }
         });
         membersList.innerHTML = "";

@@ -51,7 +51,7 @@ const forgotPassword = async (req, res, next) => {
             <h1 style='color: #0d6efd; font-weight: bold;'>GroupChat</h1>
             <h2 style='font-weight: bold;'>Reset password</h2>
             <p>Please click on the link below to reset your account password:</p>
-            <a href="http://localhost:3000/password/reset-password-page/${requestId}" style='color: #0d6efd; font-weight: bold;'>Reset password</a>`
+            <a href="http://3.104.119.209:3000/password/reset-password-page/${requestId}" style='color: #0d6efd; font-weight: bold;'>Reset password</a>`
         };
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {

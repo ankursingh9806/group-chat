@@ -26,7 +26,7 @@ async function signup(e) {
             error.textContent = "Please enter your password";
             return;
         }
-        const res = await axios.post("http://localhost:3000/user/signup", signupDetails);
+        const res = await axios.post("http://3.104.119.209:3000/user/signup", signupDetails);
         if (res.status === 201) {
             alert("Signup successfull! Please login to continue.")
             window.location.href = "../html/login.html";

@@ -12,7 +12,7 @@ logoutButton.addEventListener("click", logout);
 
 async function logout() {
     try {
-        await axios.post("http://localhost:3000/user/logout");
+        await axios.post("http://3.104.119.209:3000/user/logout");
         localStorage.clear();
         window.location.href = "../html/login.html";
     } catch (err) {

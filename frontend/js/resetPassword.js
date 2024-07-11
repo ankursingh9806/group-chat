@@ -16,7 +16,7 @@ async function resetPassword(e) {
             error.textContent = "Please enter your new password.";
             return;
         }
-        const res = await axios.post(`http://localhost:3000/password/reset-password/${resetId}`, newPasswordDetail);
+        const res = await axios.post(`http://3.104.119.209:3000/password/reset-password/${resetId}`, newPasswordDetail);
         if (res.status === 200) {
             error.textContent = "";
             document.querySelector("#password").remove();

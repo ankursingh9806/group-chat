@@ -41,7 +41,7 @@ app.use(helmet({
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "http://3.104.119.209:3000",
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE"],
     }
@@ -52,7 +52,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: "http://3.104.119.209:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
 }))
