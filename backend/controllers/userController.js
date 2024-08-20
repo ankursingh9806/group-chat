@@ -8,7 +8,7 @@ const generateAccessToken = (id, email) => {
         userId: id,
         email: email
     };
-    const token = jwt.sign(payload, process.env.TOKEN);
+    const token = jwt.sign(payload, process.env.SECRET_KEY);
     return token;
 };
 
