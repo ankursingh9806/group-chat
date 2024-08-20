@@ -99,13 +99,15 @@ ResetPassword.belongsTo(User);
 sequelize
     //.sync({ force: true })
     .sync()
-    .then((result) => {
-        // app.listen(3000);
-        server.listen(3000);
-        console.log("server is synced with database");
+    .then(() => {
+        // app.listen(3000, () => {
+        server.listen(3000, () => {
+            console.log("Node.js application is connected to MySQL");
+            console.log("Server is running on port 3000");
+        });
     })
     .catch((err) => {
-        console.error("server is unable to sync with database:", err);
+        console.error("Error connecting to MySQL:", err);
     });
 
 require("./utils/cron");
