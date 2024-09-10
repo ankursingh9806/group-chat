@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../utils/database");
 
-const ResetPassword = sequelize.define("resetpassword", {
+const ResetPassword = sequelize.define("ResetpPssword", {
     id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
