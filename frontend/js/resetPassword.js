@@ -13,7 +13,7 @@ async function resetPassword(e) {
             password: password,
         };
         if (!newPasswordDetail.password) {
-            error.textContent = "Please enter your new password.";
+            error.textContent = "Enter your new password";
             return;
         }
         const res = await axios.post(`http://localhost:3000/password/reset-password/${resetId}`, newPasswordDetail);
@@ -24,15 +24,15 @@ async function resetPassword(e) {
             document.querySelector("h2").innerHTML = "<h2 style='text-align: center;'>Password changed!</h2>";
             document.querySelector("h3").innerHTML = "<h3 style='text-align: center;'>Your password has been changed successfully!</h3>";
         } else {
-            error.textContent = "Password not changed. Please try again later.";
+            error.textContent = "Password not changed";
         }
     } catch (err) {
         if (err.response && err.response.status === 404) {
-            error.textContent = "Email not found. Please signup.";
+            error.textContent = "Email not found";
         } else if (err.response && err.response.status === 400) {
-            error.textContent = "Link expired! Please request a new link.";
+            error.textContent = "Link expired!";
         } else {
-            error.textContent = "An error occurred in changing password. Please try again later.";
+            error.textContent = "An error occurred in changing password";
         }
     }
 }
