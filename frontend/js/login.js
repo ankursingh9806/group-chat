@@ -13,11 +13,11 @@ async function login(e) {
             password: password
         };
         if (!loginDetails.email) {
-            error.textContent = "Please enter your email";
+            error.textContent = "Enter your email";
             return;
         }
         if (!loginDetails.password) {
-            error.textContent = "Please enter your password";
+            error.textContent = "Enter your password";
             return;
         }
         const res = await axios.post("http://localhost:3000/user/login", loginDetails);
@@ -25,15 +25,15 @@ async function login(e) {
             localStorage.setItem("token", res.data.token);
             window.location.href = "../html/home.html";
         } else {
-            error.textContent = "Login failed. Please try again later.";
+            error.textContent = "Login failed";
         }
     } catch (err) {
         if (err.response && err.response.status === 404) {
-            error.textContent = "Email not found. Please Sign up.";
+            error.textContent = "Email not found";
         } else if (err.response && err.response.status === 401) {
-            error.textContent = "Incorrect password. Please try again.";
+            error.textContent = "Incorrect password";
         } else {
-            error.textContent = "An error occurred during Login. Please try again later.";
+            error.textContent = "An error occurred during Login";
         }
     }
 }
