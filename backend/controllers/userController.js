@@ -38,11 +38,12 @@ const signup = async (req, res, next) => {
             return res.status(409).json({ message: "user already exists" });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({
+        const newUser = {
             name: name,
             email: email,
             password: hashedPassword
-        });
+        };
+        await User.create(newUser);
         res.status(201).json({ message: "user signed up" });
     } catch (err) {
         console.error("error:", err);
@@ -78,20 +79,6 @@ const logout = async (req, res, next) => {
     }
 }
 
-const getUserName = async (req, res, next) => {
-    try {
-        const userId = req.params.userId;
-        const user = await User.findByPk(userId);
-        if (!user) {
-            return res.status(404).json({ error: "user not found" });
-        }
-        res.status(200).json({ name: user.name });
-    } catch (err) {
-        console.error("error:", err);
-        res.status(500).json({ error: "internal server error" });
-    }
-};
-
 module.exports = {
     signupPage,
     loginPage,
@@ -99,5 +86,4 @@ module.exports = {
     login,
     generateAccessToken,
     logout,
-    getUserName
 }
