@@ -12,6 +12,5 @@ router.post("/add-to-group", authentication.authenticate, groupController.addPeo
 router.post("/remove-from-group", authentication.authenticate, groupController.removePeopleFromGroup);
 
 router.get("/get-group-members/:groupId", authentication.authenticate, groupController.getGroupMembers);
-router.get("/check-access/:groupId", authentication.authenticate, groupController.checkGroupAccess);
 
 module.exports = router;
