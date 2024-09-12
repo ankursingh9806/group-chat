@@ -30,10 +30,10 @@ const forgotPassword = async (req, res, next) => {
         if (!user) {
             return res.status(404).json({ error: "user not found" });
         }
-        const requestId = uuid.v4();
+        const resetId = uuid.v4();
         await ResetPassword.create({
-            UserId: user.id,
-            id: requestId,
+            userId: user.id,
+            id: resetId,
             active: true
         });
         const transporter = nodemailer.createTransport({
@@ -51,7 +51,7 @@ const forgotPassword = async (req, res, next) => {
             <h1 style='color: #0d6efd; font-weight: bold;'>GroupChat</h1>
             <h2 style='font-weight: bold;'>Reset password</h2>
             <p>Please click on the link below to reset your account password:</p>
-            <a href="http://localhost:3000/password/reset-password-page/${requestId}" style='color: #0d6efd; font-weight: bold;'>Reset password</a>`
+            <a href="http://localhost:3000/password/reset-password-page/${resetId}" style='color: #0d6efd; font-weight: bold;'>Reset password</a>`
         };
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
@@ -76,7 +76,7 @@ const resetPassword = async (req, res) => {
         if (!resetRequest) {
             return res.status(400).json({ error: "expired password reset request" });
         }
-        const user = await User.findOne({ where: { id: resetRequest.UserId } });
+        const user = await User.findOne({ where: { id: resetRequest.userId } });
         if (!user) {
             return res.status(404).json({ error: "user not found" });
         }

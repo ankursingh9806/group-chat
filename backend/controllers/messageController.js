@@ -1,7 +1,6 @@
 const Message = require("../models/messageModel");
-const Group = require("../models/groupModel");
-const uploadToS3 = require("../services/s3Services");
 const sequelize = require("../utils/database");
+const s3Services = require("../services/s3Services");
 
 const sendMessage = async (req, res) => {
     const t = await sequelize.transaction();
@@ -10,15 +9,15 @@ const sendMessage = async (req, res) => {
         const newMessage = await Message.create({
             name: req.user.name,
             message: message,
-            UserId: req.user.id,
+            userId: req.user.id,
             groupId: groupId
         }, { transaction: t });
         await t.commit();
-        res.status(201).json({ message: "message sent", data: newMessage });
+        res.status(201).json({ newMessage, message: "message send" });
     } catch (err) {
         await t.rollback();
         console.error("error:", err);
-        res.status(500).json({ error: "internal server error" });
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 
@@ -40,19 +39,19 @@ const uploadFile = async (req, res) => {
     try {
         const fileName = req.file.originalname;
         const fileBuffer = req.file.buffer;
-        const fileUrl = await uploadToS3.uploadToS3(fileBuffer, fileName);
+        const fileUrl = await s3Services.uploadToS3(fileBuffer, fileName);
         const newMessage = await Message.create({
             name: req.user.name,
             fileUrl: fileUrl,
-            UserId: req.user.id,
+            userId: req.user.id,
             groupId: req.params.groupId
         }, { transaction: t });
         await t.commit();
-        res.status(201).json({ message: "file sent", data: newMessage });
+        res.status(201).json({ message: "File sent", data: newMessage });
     } catch (err) {
         await t.rollback();
         console.error("error:", err);
-        res.status(500).json({ error: "internal server error" });
+        res.status(500).json({ error: "Internal server error" });
     }
 };
 

@@ -11,7 +11,7 @@ async function forgotPassword(e) {
             email: email,
         };
         if (!forgotPasswordDetail.email) {
-            error.innerHTML = "Please enter your email.";
+            error.innerHTML = "Enter your email";
             return;
         }
         const res = await axios.post("http://localhost:3000/password/forgot-password", forgotPasswordDetail);
@@ -19,15 +19,15 @@ async function forgotPassword(e) {
             error.textContent = "";
             document.querySelector("#email").remove();
             document.querySelector("button[type='submit']").remove();
-            document.querySelector("h3").innerHTML = `<h3 style='text-align: center;'>We have sent you an email. Please check your email <span style='color: #0d6efd;'>${email}</span> to reset your password</h3>`
+            document.querySelector("h3").innerHTML = `<h3 style='text-align: center;'>We have sent you an email. Please check your email <span style='color: #0d6efd;'>${email}</span> to reset your password.</h3>`
         } else {
-            error.textContent = "Email not sent. Please try again later."
+            error.textContent = "Email not sent"
         }
     } catch (err) {
         if (err.response && err.response.status === 404) {
-            error.textContent = "Email not found. Please signup.";
+            error.textContent = "Email not found";
         } else {
-            error.textContent = "An error occurred in sending email. Please try again later.";
+            error.textContent = "An error occurred in sending email";
         }
     }
 }
