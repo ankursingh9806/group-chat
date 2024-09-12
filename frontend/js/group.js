@@ -11,6 +11,7 @@ const joinableGroupsContainer = document.querySelector(".joinable-groups-contain
 const availableGroupsContainer = document.querySelector(".available-groups-container");
 const welcomeHeading = document.getElementById("welcome-heading");
 const errorText = document.getElementById("error");
+const thirdContainer = document.querySelector(".third-container");
 
 document.addEventListener("DOMContentLoaded", getGroups);
 createGroupButton.addEventListener("click", createGroup);
@@ -96,8 +97,9 @@ async function clickOnGroup(group) {
             thirdContainer.style.display = "flex";
             welcomeHeading.style.display = "none";
             await getGroupMembers(group.id);
+            await getMessage(group.id);
         } else if (isMember) {
-            inputContainer.style.display = "none";
+            inputContainer.style.display = "flex";
             groupOption.style.display = "flex";
             thirdContainer.style.display = "none";
             welcomeHeading.style.display = "none";
@@ -105,6 +107,7 @@ async function clickOnGroup(group) {
             addPeopleToGroupButton.disabled = true;
             removePeopleFromGroupButton.disabled = true;
             await getGroupMembers(group.id);
+            await getMessage(group.id);
         } else {
             alert("You are not a member of this group!");
         }
