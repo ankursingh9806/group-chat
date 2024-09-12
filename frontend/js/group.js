@@ -5,9 +5,7 @@ const removePeopleFromGroupButton = document.getElementById("remove-from-group-b
 
 const membersList = document.getElementById("members-list");
 const groupOption = document.querySelector(".group-option-container");
-const createdGroupName = document.getElementById("created-group-name");
 const createdGroupsContainer = document.querySelector(".created-groups-container");
-const joinableGroupsContainer = document.querySelector(".joinable-groups-container");
 const welcomeHeading = document.getElementById("welcome-heading");
 const errorText = document.getElementById("error");
 
@@ -23,6 +21,7 @@ async function getGroups() {
         const res = await axios.get(`http://localhost:3000/group/get-groups`, {
             headers: { Authorization: token }
         });
+        createdGroupsContainer.innerHTML = "";
         res.data.groups.forEach(group => {
             showGroupOnScreen(group);
         });
@@ -47,14 +46,13 @@ async function createGroup(e) {
             headers: { Authorization: token }
         });
         if (res.status === 201) {
-            showGroupOnScreen(res.data.group);
+            await getGroups();
             errorText.textContent = "";
             document.getElementById("group-name").value = "";
         } else {
             alert("Failed to create group!");
         }
     } catch (err) {
-        errorText.textContent = "Error in creating group!";
         console.error("error in creating group:", err);
     }
 }
@@ -69,43 +67,44 @@ async function showGroupOnScreen(group) {
         newGroup.addEventListener("click", function () {
             clickOnGroup(group);
         });
-        if (group.isAdmin) {
-            createdGroupsContainer.appendChild(newGroup);
-        } else {
-            joinableGroupsContainer.appendChild(newGroup);
-        }
+        createdGroupsContainer.appendChild(newGroup);
     } catch (err) {
-        console.error("error checking access to group:", err);
+        console.error("error showing group on screen:", err);
     }
 }
 
 async function clickOnGroup(group) {
     try {
-        if (group.isAdmin) {
+        const isAdmin = group.isAdmin;
+        const isMember = group.isMember;
+        inputContainer.dataset.groupId = group.id;
+        if (isAdmin) {
             inputContainer.style.display = "flex";
             groupOption.style.display = "flex";
             thirdContainer.style.display = "flex";
-            createdGroupName.textContent = group.name;
-            inputContainer.dataset.groupId = group.id;
-            inputContainer.dataset.isAdmin = group.isAdmin ? "true" : "false";
-            welcomeHeading.style.display = "none"
-            getGroupMembers(group.id);
+            welcomeHeading.style.display = "none";
+            await getGroupMembers(group.id);
+        } else if (isMember) {
+            inputContainer.style.display = "none";
+            groupOption.style.display = "flex";
+            thirdContainer.style.display = "none";
+            welcomeHeading.style.display = "none";
+            deleteGroupButton.disabled = true;
+            addPeopleToGroupButton.disabled = true;
+            removePeopleFromGroupButton.disabled = true;
+            await getGroupMembers(group.id);
         } else {
-            alert("You are not a member or admin of this group!");
+            alert("You are not a member of this group!");
         }
     } catch (err) {
-        console.error("error in opening group:", err);
+        console.error("error opening group:", err);
     }
 }
+
 
 async function deleteGroup() {
     try {
         const groupId = inputContainer.dataset.groupId;
-        const isAdmin = inputContainer.dataset.isAdmin;
-        if (!isAdmin) {
-            alert("Only the admin can add people to this group!");
-            return;
-        }
         const confirmation = window.confirm("Are you sure you want to delete this group?");
         if (!confirmation) return;
         const token = localStorage.getItem("token");
@@ -130,14 +129,9 @@ async function deleteGroup() {
 async function addPeopleToGroup() {
     try {
         const groupId = inputContainer.dataset.groupId;
-        const isAdmin = inputContainer.dataset.isAdmin === "true";
-        if (!isAdmin) {
-            alert("Only the admin can add people to this group!");
-            return;
-        }
+        const token = localStorage.getItem("token");
         const email = window.prompt("Enter the email of the user to add:");
         if (!email) return;
-        const token = localStorage.getItem("token");
         const res = await axios.post(`http://localhost:3000/group/add-to-group`, { email, groupId }, {
             headers: { Authorization: token }
         });
@@ -160,14 +154,9 @@ async function addPeopleToGroup() {
 async function removePeopleFromGroup() {
     try {
         const groupId = inputContainer.dataset.groupId;
-        const isAdmin = inputContainer.dataset.isAdmin === "true";
-        if (!isAdmin) {
-            alert("Only the admin can add people to this group!");
-            return;
-        }
+        const token = localStorage.getItem("token");
         const email = window.prompt("Enter the email of the user to remove:");
         if (!email) return;
-        const token = localStorage.getItem("token");
         const res = await axios.post(`http://localhost:3000/group/remove-from-group`, { email, groupId }, {
             headers: { Authorization: token }
         });
@@ -193,12 +182,11 @@ async function getGroupMembers(groupId) {
         const res = await axios.get(`http://localhost:3000/group/get-group-members/${groupId}`, {
             headers: { Authorization: token }
         });
-
         if (res.status === 200) {
             membersList.innerHTML = "";
             res.data.users.forEach(user => {
                 const listItem = document.createElement("li");
-                listItem.innerHTML = `${user.name}<br>${user.email}<br>${user.isAdmin ? "<strong>Admin</strong>" : ""}`;
+                listItem.innerHTML = `${user.name}<br>${user.email}<br>${user.role === "admin" ? "<strong>Admin</strong>" : ""}`;
                 membersList.appendChild(listItem);
             });
             thirdContainer.style.display = "block";
