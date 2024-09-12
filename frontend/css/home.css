@@ -120,12 +120,19 @@ span {
     color: #000000;
 }
 
-#created-group-name {
+#opened-group-name {
     font-size: 24px;
+    font-weight: bold;
     color: #0d6efd;
     padding-left: 5px;
     padding-right: 5px;
     margin-top: 10px;
+}
+
+h2 {
+    font-size: 14px;
+    text-align: left;
+    padding: 5px;
 }
 
 /* buttons */
