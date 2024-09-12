@@ -16,10 +16,6 @@ const Group = sequelize.define("Group", {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
-    isAdmin: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-    }
 });
 
 module.exports = Group;
