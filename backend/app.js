@@ -63,6 +63,7 @@ app.use("/message", messageRoute);
 app.use("/group", groupRoute);
 app.use("/password", resetPasswordRoute);
 
+// undefined route
 app.use((req, res) => {
     res.sendFile(path.join(__dirname, "..", "frontend", "html", "login.html"));
 });
