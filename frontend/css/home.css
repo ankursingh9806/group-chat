@@ -109,6 +109,15 @@ textarea {
     margin-bottom: 10px;
 }
 
+.message-image {
+    background-color: #fff;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
 /* headings */
 #welcome-heading {
     margin-bottom: 550px;

@@ -1,8 +1,9 @@
 const sendButton = document.getElementById("send-button");
 const messageInput = document.getElementById("message-input");
-
 const inputContainer = document.querySelector(".input-container");
 const messageContainer = document.querySelector(".message-container");
+const fileInput = document.getElementById('file-input');
+const attachFileButton = document.getElementById('attach-file-button');
 
 const socket = io("http://localhost:3000");
 
@@ -12,6 +13,10 @@ socket.on("sendMessage", (data) => {
 });
 
 sendButton.addEventListener("click", sendMessage);
+attachFileButton.addEventListener("click", () => {
+    fileInput.click();
+});
+fileInput.addEventListener("change", uploadFile);
 
 async function getMessage(groupId) {
     try {
@@ -31,9 +36,15 @@ async function getMessage(groupId) {
 function showMessage(msg) {
     const messageElement = document.createElement("div");
     messageElement.className = "message";
-    messageElement.innerHTML = `
-        <span class="message-name">${msg.name}</span><br>
-        <span class="message-text">${msg.message}</span>`;
+    if (msg.fileUrl) {
+        messageElement.innerHTML = `
+            <span class="message-name">${msg.name}</span><br>
+            <a href="${msg.fileUrl}" target="_blank" class="message-image">View file</a>`;
+    } else {
+        messageElement.innerHTML = `
+            <span class="message-name">${msg.name}</span><br>
+            <span class="message-text">${msg.message}</span>`;
+    }
     messageContainer.appendChild(messageElement);
     scrollToBottom();
 }
@@ -69,6 +80,28 @@ async function sendMessage() {
         console.error("error in sending message:", err);
     }
 }
+
 function scrollToBottom() {
     messageContainer.scrollTop = messageContainer.scrollHeight;
+}
+
+async function uploadFile(e) {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+        const groupId = inputContainer.dataset.groupId;
+        const token = localStorage.getItem("token");
+        const res = await axios.post(`http://localhost:3000/message/upload-file/${groupId}`, formData, {
+            headers: {
+                Authorization: token,
+                "Content-Type": "multipart/form-data"
+            }
+        });
+        const newMessage = res.data.data;
+        socket.emit("receiveMessage", newMessage);
+        messageInput.value = "";
+    } catch (err) {
+        console.error("file not uploaded:", err);
+    }
 }
