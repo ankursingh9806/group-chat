@@ -5,7 +5,10 @@ const removePeopleFromGroupButton = document.getElementById("remove-from-group-b
 
 const membersList = document.getElementById("members-list");
 const groupOption = document.querySelector(".group-option-container");
+const openedGroupName = document.getElementById("opened-group-name");
 const createdGroupsContainer = document.querySelector(".created-groups-container");
+const joinableGroupsContainer = document.querySelector(".joinable-groups-container");
+const availableGroupsContainer = document.querySelector(".available-groups-container");
 const welcomeHeading = document.getElementById("welcome-heading");
 const errorText = document.getElementById("error");
 
@@ -67,7 +70,15 @@ async function showGroupOnScreen(group) {
         newGroup.addEventListener("click", function () {
             clickOnGroup(group);
         });
-        createdGroupsContainer.appendChild(newGroup);
+        const isAdmin = group.isAdmin;
+        const isMember = group.isMember;
+        if (isAdmin) {
+            createdGroupsContainer.appendChild(newGroup);
+        } else if (isMember) {
+            joinableGroupsContainer.appendChild(newGroup);
+        } else {
+            availableGroupsContainer.appendChild(newGroup);
+        }
     } catch (err) {
         console.error("error showing group on screen:", err);
     }
@@ -78,6 +89,7 @@ async function clickOnGroup(group) {
         const isAdmin = group.isAdmin;
         const isMember = group.isMember;
         inputContainer.dataset.groupId = group.id;
+        openedGroupName.textContent = group.name;
         if (isAdmin) {
             inputContainer.style.display = "flex";
             groupOption.style.display = "flex";
