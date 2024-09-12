@@ -24,7 +24,7 @@ This project allows users to create, join, and manage groups for real-time commu
 - **Database**: MySQL (with Sequelize ORM), MongoDB (Mongoose ODM on a separate branch)
 - **Cloud Services**: AWS SDK (for file sharing)
 - **Email Service**: Nodemailer
-- **Other Tools**: Axios, Bcrypt, CORS, Dotenv, Helmet, Morgan, Multer, node-cron, UUID
+- **Other Tools**: Axios, Bcrypt, CORS, Dotenv, Helmet, Morgan, Multer, Node-Cron, UUID
 
 ## API Endpoints
 
