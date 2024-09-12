@@ -106,3 +106,5 @@ sequelize
     .catch((err) => {
         console.error("Error connecting to MySQL:", err);
     });
+
+require("./utils/cron.js");
