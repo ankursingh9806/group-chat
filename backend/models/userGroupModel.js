@@ -8,6 +8,11 @@ const UserGroup = sequelize.define("UserGroup", {
         allowNull: false,
         primaryKey: true,
     },
+    role: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: "member",
+    }
 });
 
 module.exports = UserGroup;
