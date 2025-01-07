@@ -18,7 +18,7 @@ This project allows users to create, join, and manage groups for real-time commu
 
 ## Technology Stack
 
-- **Backend**: Node.js, Express, Socket.IO
+- **Backend**: Node.js, Express.js, Socket.IO
 - **Frontend**: HTML5, CSS3, JavaScript, Bootstrap
 - **Authentication**: JSON Web Token (JWT)
 - **Database**: MySQL (with Sequelize ORM), MongoDB (Mongoose ODM on a separate branch)
